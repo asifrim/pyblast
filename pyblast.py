@@ -213,7 +213,7 @@ def __run_blast_select_loop(input_file, popens, fields):
         # records and emit them
         for fd in rl:
             rs = fd_map[fd]['result_buffer']
-            rbuf = os.read(fd, select.PIPE_BUF)
+            rbuf = os.read(fd, select.PIPE_BUF).decode("utf-8")
 
             # The blast process has finished emitting records. Stop
             # attempting to read from or write to it. If we have
@@ -227,7 +227,7 @@ def __run_blast_select_loop(input_file, popens, fields):
                 if not p.stdin.closed:
                     wfds.remove(p.stdin.fileno())
                     p.stdin.close()
-                
+
                 continue
 
             rs += rbuf
@@ -262,7 +262,7 @@ def __run_blast_select_loop(input_file, popens, fields):
             #      this file descriptor is writable, writes can fail
             #      with EWOULDBLOCK. Handle this gracefully.
             try:
-                written = os.write(fd, qs)
+                written = os.write(fd, qs.encode())
                 qs = qs[written:]
             except OSError as e:
                 assert e.errno == errno.EWOULDBLOCK
